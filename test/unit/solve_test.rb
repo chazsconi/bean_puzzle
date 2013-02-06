@@ -1,7 +1,10 @@
 require 'test_helper'
-require '../script/solve.rb'
+require './script/solve.rb'
 
 class PuzzleTest < ActiveSupport::TestCase
+  
+  INITIAL_STATE = "L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9"
+  
   setup do
     @puzzle = Puzzle.new
   end
@@ -12,8 +15,8 @@ class PuzzleTest < ActiveSupport::TestCase
 
   test "initial history and states" do
     assert_equal [step:0, state:"L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9", side:nil, n:nil, solved:true ], @puzzle.history
-    assert_equal ["L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9"], @puzzle.states.to_a
-    assert_equal ["L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9"], @puzzle.solved_states.to_a
+    assert_equal [INITIAL_STATE], @puzzle.states.to_a
+    assert_equal [INITIAL_STATE], @puzzle.solved_states.to_a
   end
   
   test "initially solved" do
@@ -21,7 +24,7 @@ class PuzzleTest < ActiveSupport::TestCase
   end
   
   test "initial state" do
-    assert_equal "L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9", @puzzle.state
+    assert_equal INITIAL_STATE, @puzzle.state
   end
   
   test "state after 1 shift on left" do
@@ -36,11 +39,17 @@ class PuzzleTest < ActiveSupport::TestCase
   
   test "shift 6 times has no effect" do
     @puzzle.shift(:left,6)
-    assert_equal "L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9", @puzzle.state
+    assert_equal INITIAL_STATE, @puzzle.state
     @puzzle.shift(:right,6)
-    assert_equal "L1L2L3L4L5L6L7L8L9C1C2C3R1R2R3R4R5R6R7R8R9", @puzzle.state
+    assert_equal INITIAL_STATE, @puzzle.state
   end
   
+  test "changes to original puzzle do not affect clone" do
+    cloned_puzzle = @puzzle.deep_clone
+    @puzzle.shift(:left,3)
+    @puzzle.shift(:right,2)
+    assert_equal INITIAL_STATE, cloned_puzzle.state
+  end
 end
 
 class BeanTest < ActiveSupport::TestCase
